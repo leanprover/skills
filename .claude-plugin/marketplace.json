@@ -1,0 +1,13 @@
+{
+  "name": "leanprover",
+  "owner": {
+    "name": "Lean FRO, LLC"
+  },
+  "plugins": [
+    {
+      "name": "lean",
+      "source": ".",
+      "description": "Skills for developing with Lean 4 and Mathlib"
+    }
+  ]
+}
