@@ -4,25 +4,16 @@ Official [Agent Skills](https://agentskills.io) for developing with [Lean 4](htt
 
 These skills help AI coding agents work effectively with Lean 4 code — writing proofs, setting up development environments, debugging toolchain regressions, and following project conventions.
 
-## Cross-platform support
-
-These skills follow the [Agent Skills](https://agentskills.io) open standard and work with:
-
-- **Claude Code** — install as a plugin (see below)
-- **Gemini CLI** — install as an extension (see below)
-- **Codex CLI** — install skills to `~/.codex/skills/` (see below)
-- **Cursor, VS Code Copilot, Amp**, and other compatible tools
-
 ## Skills included
 
 | Skill | Description |
 |-------|-------------|
-| `lean-proof` | Methodology for writing Lean proofs: one step at a time, error priority, hardest case first |
-| `lean4-setup` | Setting up a lean4 development environment with elan toolchains |
+| `lean-proof` | Writing Lean proofs: one step at a time, error priority, hardest case first |
+| `lean-setup` | Setting up a lean4 development environment with elan toolchains |
 | `lean-bisect` | Bisecting Lean toolchain versions to find regressions |
 | `lean-mwe` | Creating minimal working examples for bug reports |
-| `mathlib-build` | Building Mathlib with appropriate verbosity settings |
 | `lean-pr` | PR conventions for the lean4 repository |
+| `mathlib-build` | Building Mathlib with appropriate verbosity settings |
 | `mathlib-pr` | PR conventions for Mathlib: labels, merge process, queueboard |
 | `mathlib-review` | Review guidelines for Mathlib PRs: tools, attributes, style checks |
 | `nightly-testing` | Understanding the Lean/Mathlib nightly testing infrastructure |
