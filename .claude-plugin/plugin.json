@@ -5,8 +5,8 @@
   "author": {
     "name": "Lean FRO, LLC"
   },
-  "homepage": "https://github.com/leanprover/lean-skills",
-  "repository": "https://github.com/leanprover/lean-skills",
+  "homepage": "https://github.com/leanprover/skills",
+  "repository": "https://github.com/leanprover/skills",
   "license": "Apache-2.0",
   "keywords": ["lean", "lean4", "mathlib", "theorem-proving", "formal-verification"]
 }

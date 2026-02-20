@@ -37,14 +37,14 @@ Skills are then available as `/lean:proof`, `/lean:setup`, etc.
 
 For local testing:
 ```bash
-git clone https://github.com/leanprover/lean-skills.git
-claude --plugin-dir ./lean-skills
+git clone https://github.com/leanprover/skills.git
+claude --plugin-dir ./skills
 ```
 
 ### Gemini CLI
 
 ```bash
-gemini extensions install https://github.com/leanprover/lean-skills
+gemini extensions install https://github.com/leanprover/skills
 ```
 
 ### Other tools
