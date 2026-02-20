@@ -1,0 +1,12 @@
+{
+  "name": "lean",
+  "description": "Skills for developing with Lean 4 and Mathlib — proof methodology, toolchain setup, bootstrapping, bisection, and more",
+  "version": "0.1.0",
+  "author": {
+    "name": "Lean FRO, LLC"
+  },
+  "homepage": "https://github.com/leanprover/lean-skills",
+  "repository": "https://github.com/leanprover/lean-skills",
+  "license": "Apache-2.0",
+  "keywords": ["lean", "lean4", "mathlib", "theorem-proving", "formal-verification"]
+}
