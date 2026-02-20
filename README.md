@@ -22,7 +22,7 @@ These skills follow the [Agent Skills](https://agentskills.io) open standard and
 | `lean-bisect` | Bisecting Lean toolchain versions to find regressions |
 | `lean-mwe` | Creating minimal working examples for bug reports |
 | `mathlib-build` | Building Mathlib with appropriate verbosity settings |
-| `lean-pr` | PR conventions for lean4 and mathlib4 repositories |
+| `lean-pr` | PR conventions for the lean4 repository |
 | `mathlib-pr` | PR conventions for Mathlib: labels, merge process, queueboard |
 | `mathlib-review` | Review guidelines for Mathlib PRs: tools, attributes, style checks |
 | `nightly-testing` | Understanding the Lean/Mathlib nightly testing infrastructure |
@@ -34,8 +34,6 @@ These skills follow the [Agent Skills](https://agentskills.io) open standard and
 ```
 /plugin install lean
 ```
-
-Skills are then available as `/lean:proof`, `/lean:setup`, etc.
 
 For local testing:
 ```bash

@@ -1,6 +1,6 @@
 {
   "name": "lean",
-  "description": "Skills for developing with Lean 4 and Mathlib — proof methodology, toolchain setup, bootstrapping, bisection, and more",
+  "description": "Skills for developing with Lean 4 and Mathlib — proof methodology, toolchain setup, bisection, and more",
   "version": "0.1.0",
   "author": {
     "name": "Lean FRO, LLC"
