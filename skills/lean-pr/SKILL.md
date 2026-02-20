@@ -1,18 +1,16 @@
 ---
 name: lean-pr
-description: PR conventions for the lean4 and mathlib4 repositories. Use when creating pull requests, writing commit messages, or following project conventions for Lean contributions.
+description: PR conventions for the leanprover/lean4 repository. Use when creating pull requests, writing commit messages, or following project conventions for Lean contributions.
 ---
 
 # Lean PR Conventions
 
 ## Commit Message Format
 
-Both lean4 and mathlib4 use this convention (based on AngularJS):
+All PR titles must follow the format:
 
 ```
 <type>: <subject>
-
-<body>
 ```
 
 **`<type>`** is one of:
@@ -30,10 +28,10 @@ Both lean4 and mathlib4 use this convention (based on AngularJS):
 - Do not capitalize the first letter
 - No trailing period
 
-**`<body>`** constraints:
+The PR description must:
 - Use imperative, present tense
 - Include motivation for the change and contrast with previous behavior
-- For `feat` or `fix` commits, the body must begin with "This PR "
+- For `feat` or `fix` commits, the body must begin with "This PR ", and the first paragraph will be automatically incorporated into release notes.
 
 ## Changelog Labels
 
@@ -84,22 +82,11 @@ Authors: Author Name
 
 Check other recent files in the repository to determine the correct copyright holder. Test files (in `tests/`) do not need copyright headers.
 
-## Mathlib PR Conventions
+## PR Conventions
 
-For mathlib4 PRs, keep descriptions **concise**:
+Keep descriptions **concise**:
 
 - Start with a paragraph beginning "This PR ..." — no section headers
 - No "## Summary" header — just start with the text
-- No "Test plan" section — mathlib has CI
+- No "Test plan" section — we rely on CI
 - No "Implementation details" section — the code speaks for itself
-
-## Mathlib Adaptation Notes
-
-When adding adaptation notes for Lean version changes in Mathlib:
-
-```lean
-#adaptation_note /-- https://github.com/leanprover/lean4/issues/XXXXX
-Description of the change -/
-```
-
-This is a Mathlib command. Do NOT use regular comments like `-- #adaptation_note`.

@@ -54,6 +54,21 @@ When working on a specific theorem, **go directly to that theorem**. Don't get d
 
 **Key insight**: Lean treats `sorry` as an axiom. If theorem A uses lemma B, and lemma B has a `sorry`, theorem A can still be worked on — Lean will accept lemma B as given. The `sorry`s in helper lemmas can be filled in later.
 
+In successive steps, we want to move sorries earlier in the file, by replace the `sorry` proof of a theorem with the main steps, and then references to simpler lemmas which we insert before the theorem.
+
+For example, replacing
+```
+theorem main_theorem : A = C := by sorry
+```
+with
+```
+theorem lemma1 : A = B := by sorry
+theorem lemma2 : B = C := by sorry
+theorem main_theorem : A = C := by
+  rw [lemma1, lemma2]
+```
+is progress! (Assuming this actually reflects the structure of the proof.)
+
 ### Within a Proof
 
 When a proof has multiple cases (e.g., `match` on a nat giving cases 0, 1, n+2), ALWAYS work on the hardest case first.
@@ -76,24 +91,6 @@ After getting a proof to work, clean it up immediately:
 - Find the truly minimal proof
 
 Complete ALL cleanup steps before moving to the next proof.
-
-## Recognizing Standard vs. Hard Goals
-
-Goals that look like textbook computations usually ARE solvable with standard tactics. Don't give up when you're making progress toward a standard form.
-
-**Derivative computations:**
-```lean
-⊢ deriv (fun x => some_function x) x = expected_derivative
-```
-If expected_derivative looks like what you'd get from calculus rules, try derivative tactics.
-
-**Algebraic simplifications:**
-```lean
-⊢ some_expression = simplified_form
-```
-If simplified_form looks like the "obvious" simplification, try `ring`, `field_simp`, `simp`.
-
-For textbook-looking computations, try: obvious tactic -> domain-specific tactics -> step-by-step -> only then `sorry`.
 
 ## Dependent Type Rewriting Issues
 
