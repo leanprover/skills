@@ -6,8 +6,8 @@
   "plugins": [
     {
       "name": "lean",
-      "source": ".",
-      "description": "Skills for developing with Lean 4 and Mathlib"
+      "source": "./",
+      "description": "Skills for developing with Lean 4"
     }
   ]
 }
