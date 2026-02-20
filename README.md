@@ -22,20 +22,18 @@ These skills help AI coding agents work effectively with Lean 4 code — writing
 
 ### Claude Code
 
-```
-/plugin install lean
-```
+In Claude Code, type `/plugin`, under "Marketplaces" add "https://github.com/leanprover/skills.git", then under "Plugins" install the `lean` plugin.
 
-For local testing:
-```bash
-git clone https://github.com/leanprover/skills.git
-claude --plugin-dir ./skills
+Or in a terminal
+```
+claude plugin marketplace add https://github.com/leanprover/skills.git
+claude plugin install lean@leanprover
 ```
 
 ### Gemini CLI
 
 ```bash
-gemini extensions install https://github.com/leanprover/skills
+gemini skills install https://github.com/leanprover/skills --path skills
 ```
 
 ### Codex CLI
