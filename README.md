@@ -38,12 +38,12 @@ gemini skills install https://github.com/leanprover/skills --path skills
 
 ### Codex CLI
 
-Inside a Codex session, install individual skills:
+Inside a Codex session:
 ```
-$skill-installer install https://github.com/leanprover/skills/tree/main/skills/lean-proof
+$skill-installer install https://github.com/leanprover/skills/tree/main/skills/*
 ```
 
-Or clone and copy all skills at once:
+Or clone and copy the skills:
 ```bash
 git clone https://github.com/leanprover/skills.git /tmp/lean-skills
 cp -r /tmp/lean-skills/skills/* ~/.codex/skills/
