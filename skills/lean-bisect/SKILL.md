@@ -5,80 +5,49 @@ description: Bisect Lean toolchain versions to find where behavior changes. Use 
 
 # Bisecting Lean Toolchains
 
-This skill covers using the `lean-bisect` script (found in the lean4 repository at `script/lean-bisect`) to identify which Lean 4 commit introduced a behavior change or regression.
+Use the `lean-bisect` script (in the lean4 repo at `script/lean-bisect`) to find which commit introduced a behavior change.
 
-## Requirements for Test Files
+## Test File Requirements
 
-**Test files must be self-contained with no Mathlib dependencies.**
+Test files must be self-contained with no `Mathlib` imports (Mathlib is pinned to specific toolchains and will fail on most versions tested). See the minimization skill if you need to reduce a Mathlib test case to a standalone one.
 
-lean-bisect works by testing your file against different Lean 4 toolchains. Since Mathlib is pinned to specific toolchains, Mathlib imports will fail on most versions being tested.
+## Usage
 
-The test file should only use:
-- Lean 4 standard library (`Lean.*`, `Std.*`)
-- Axioms and local definitions
-- No external package imports
-
-## Usage Patterns
-
-### Basic usage (auto-find regression)
 ```bash
+# Auto-find regression
 script/lean-bisect /tmp/test.lean
-```
 
-### Bisect to a nightly
-```bash
+# Bisect up to a given nightly
 script/lean-bisect /tmp/test.lean ..nightly-2024-06-01
-```
 
-### Bisect between nightlies
-```bash
+# Between nightlies
 script/lean-bisect /tmp/test.lean nightly-2024-01-01..nightly-2024-06-01
-```
 
-### Bisect between commits
-```bash
+# Between commits
 script/lean-bisect /tmp/test.lean abc1234..def5678
-```
 
-### With timeout
-```bash
+# With timeout
 script/lean-bisect /tmp/test.lean --timeout 30
 ```
 
-## How It Determines Pass/Fail
+## Pass/Fail Determination
 
-The script uses a "signature" based on:
-1. Exit code (0 = success, non-zero = failure, -124 = timeout)
-2. stdout content
-3. stderr content
+The script compares a "signature" of exit code + stdout + stderr. It bisects to find where this signature changes. Use `--ignore-messages` to only consider exit code.
 
-By default, it looks for changes in this full signature. Use `--ignore-messages` to only consider exit code.
+## Test File Patterns
 
-## Creating Test Files
-
-### For Behavior Changes
+### Using exit code
 
 ```lean
-/-
-Test case: describe what changed
-
-Expected:
-- v4.XX.X: behavior A
-- v4.YY.Y: behavior B
--/
-
--- Define minimal setup using axioms
 axiom G : Type
 axiom op : G -> G -> G
 
--- The test that shows the behavior difference
 example : ... := by
   <the failing tactic call>
 ```
 
-### For Error Messages
+### Using `#guard_msgs`
 
-Use `#guard_msgs` to check specific error messages:
 ```lean
 /--
 error: the specific error that should appear
@@ -89,28 +58,20 @@ example : ... := by ...
 
 ## Options
 
-- `--timeout N`: Timeout in seconds for each test
-- `--ignore-messages`: Only compare exit codes, ignore stdout/stderr
-- `--nightly-only`: When bisecting commits, only test nightly releases
-- `--selftest`: Run self-test to verify the script works
-- `--clear-cache`: Clear the CI artifact cache
-
-## Caching
-
-The script caches downloaded Lean builds in `~/.cache/lean_build_artifact/`. This speeds up repeated bisections significantly. Use `--clear-cache` if you need fresh builds.
+- `--timeout N`: Timeout in seconds per test
+- `--ignore-messages`: Only compare exit codes
+- `--nightly-only`: Only test nightly releases when bisecting commits
+- `--selftest`: Verify the script works
+- `--clear-cache`: Clear `~/.cache/lean_build_artifact/`
 
 ## Workflow for Mathlib Issues
 
 When the issue requires Mathlib:
 
-1. **Create a minimal test case** that reproduces the issue
-2. **Use lean-minimizer** to create a Mathlib-free version (see the `lean-mwe` skill)
-3. **Run lean-bisect** on the minimized file
-4. **Document the findings** including the problematic commit
+1. Create a minimal test case
+2. Use https://github.com/kim-em/mathlib-minimizer to produce a Mathlib-free version (see `lean-mwe` skill)
+3. Run lean-bisect on the minimized file
 
 ## Tips
 
-1. **Start with a known-good and known-bad version**: Before bisecting, verify your test file actually shows different behavior on the endpoints.
-2. **Make the test deterministic**: Avoid tests that might have different behavior based on timing or randomness.
-3. **Keep the test fast**: Each bisection step runs the full test. A 1-second test is much better than a 10-second test.
-4. **For complex issues**: The issue might span multiple commits. Be prepared to bisect multiple times with different test cases.
+Verify endpoints of the range show different behavior before bisecting. Keep tests fast — each bisection step runs the full test.

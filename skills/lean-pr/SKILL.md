@@ -23,15 +23,9 @@ All PR titles must follow the format:
 - `chore` — maintenance
 - `perf` — performance improvement
 
-**`<subject>`** constraints:
-- Use imperative, present tense: "change" not "changed" nor "changes"
-- Do not capitalize the first letter
-- No trailing period
+**`<subject>`**: imperative present tense, lowercase, no period.
 
-The PR description must:
-- Use imperative, present tense
-- Include motivation for the change and contrast with previous behavior
-- For `feat` or `fix` commits, the body must begin with "This PR ", and the first paragraph will be automatically incorporated into release notes.
+For `feat`/`fix` PRs, begin the description with "This PR " — the first paragraph is automatically used in release notes.
 
 ## Changelog Labels
 
