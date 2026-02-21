@@ -56,6 +56,9 @@ printf "%-20s %-25s %-15s %-22s %s\n" "SKILL" "TEST" "STATUS" "RESULT DATE" "NOT
 printf "%-20s %-25s %-15s %-22s %s\n" "-----" "----" "------" "-----------" "-----"
 
 all_ok=true
+skills_to_run=()
+skills_to_judge=()
+skills_needing_tests=()
 
 for skill in "${skills[@]}"; do
   tests_dir="$SKILLS_ROOT/skills/$skill/tests"
@@ -65,6 +68,7 @@ for skill in "${skills[@]}"; do
   if [[ ! -d "$tests_dir" ]]; then
     printf "%-20s %-25s %-15s %-22s %s\n" "$skill" "-" "no-tests" "-" "No tests/ directory"
     all_ok=false
+    skills_needing_tests+=("$skill")
     continue
   fi
 
@@ -73,6 +77,7 @@ for skill in "${skills[@]}"; do
   if [[ ! -f "${test_files[0]}" ]]; then
     printf "%-20s %-25s %-15s %-22s %s\n" "$skill" "-" "no-tests" "-" "No .yaml files in tests/"
     all_ok=false
+    skills_needing_tests+=("$skill")
     continue
   fi
 
@@ -90,6 +95,7 @@ for skill in "${skills[@]}"; do
     if [[ ! -d "$results_test_dir" ]]; then
       printf "%-20s %-25s %-15s %-22s %s\n" "$skill" "$test_name" "missing" "-" "No results found"
       all_ok=false
+      skills_to_run+=("$skill")
       continue
     fi
 
@@ -98,6 +104,7 @@ for skill in "${skills[@]}"; do
     if [[ -z "$latest_dir" ]]; then
       printf "%-20s %-25s %-15s %-22s %s\n" "$skill" "$test_name" "missing" "-" "No result directories"
       all_ok=false
+      skills_to_run+=("$skill")
       continue
     fi
 
@@ -108,6 +115,7 @@ for skill in "${skills[@]}"; do
     if [[ ! -f "$judge_file" ]]; then
       printf "%-20s %-25s %-15s %-22s %s\n" "$skill" "$test_name" "unjudged" "$timestamp" "No judge.json"
       all_ok=false
+      skills_to_judge+=("$skill")
       continue
     fi
 
@@ -133,11 +141,13 @@ for skill in "${skills[@]}"; do
     if $stale; then
       printf "%-20s %-25s %-15s %-22s %s\n" "$skill" "$test_name" "stale" "$timestamp" "$stale_note"
       all_ok=false
+      skills_to_run+=("$skill")
     elif [[ "$status" == "satisfactory" ]]; then
       printf "%-20s %-25s %-15s %-22s %s\n" "$skill" "$test_name" "ok" "$timestamp" ""
     else
       printf "%-20s %-25s %-15s %-22s %s\n" "$skill" "$test_name" "$status" "$timestamp" ""
       all_ok=false
+      skills_to_run+=("$skill")
     fi
   done
 done
@@ -147,7 +157,41 @@ echo
 if $all_ok; then
   echo "All skills validated."
   exit 0
-else
-  echo "Some skills need attention. Run skills-testing/scripts/run-skill-tests <skill> to update."
-  exit 1
 fi
+
+# --- Print actionable next steps ---
+
+# Deduplicate
+skills_to_run=($(printf '%s\n' "${skills_to_run[@]}" | sort -u))
+skills_to_judge=($(printf '%s\n' "${skills_to_judge[@]}" | sort -u))
+skills_needing_tests=($(printf '%s\n' "${skills_needing_tests[@]}" | sort -u))
+
+echo "Next steps:"
+echo
+
+if [[ ${#skills_needing_tests[@]} -gt 0 ]]; then
+  echo "# Add test cases for:"
+  for s in "${skills_needing_tests[@]}"; do
+    echo "#   skills/$s/tests/<test-name>.yaml"
+  done
+  echo
+fi
+
+if [[ ${#skills_to_run[@]} -gt 0 ]]; then
+  for s in "${skills_to_run[@]}"; do
+    echo "skills-testing/scripts/run-skill-tests $s"
+  done
+  echo
+fi
+
+if [[ ${#skills_to_judge[@]} -gt 0 ]]; then
+  echo "skills-testing/scripts/judge-all"
+  echo
+fi
+
+if [[ ${#skills_to_run[@]} -gt 0 ]] || [[ ${#skills_to_judge[@]} -gt 0 ]]; then
+  echo "# Then commit results:"
+  echo "cd skills-testing && git add -A && git commit -m 'Update test results' && git push && cd .."
+fi
+
+exit 1
