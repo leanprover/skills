@@ -1,0 +1,153 @@
+#!/usr/bin/env bash
+# Check that all skills have current, satisfactory test results.
+#
+# Usage:
+#   check-validation              # check all skills
+#   check-validation lean-proof   # check one skill
+#
+# Clones leanprover/skills-testing into ./skills-testing/ if not already present.
+# For each skill, checks that:
+#   1. At least one test YAML exists in skills/<skill>/tests/
+#   2. Results exist in skills-testing/results/<skill>/<test>/
+#   3. The latest judge.json has skill_status: "satisfactory"
+#   4. The result is newer than the last modification of SKILL.md and the test YAML
+#
+# Exit code: 0 if all checks pass, 1 if any fail.
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SKILLS_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+TESTING_DIR="$SKILLS_ROOT/skills-testing"
+
+# --- Ensure skills-testing is available ---
+
+if [[ ! -d "$TESTING_DIR" ]]; then
+  echo "Cloning leanprover/skills-testing into ./skills-testing/..." >&2
+  git clone --quiet https://github.com/leanprover/skills-testing.git "$TESTING_DIR"
+fi
+
+RESULTS_DIR="$TESTING_DIR/results"
+
+# --- Parse arguments ---
+
+skill_filter="${1:-}"
+
+# --- Collect skills ---
+
+skills=()
+for skill_file in "$SKILLS_ROOT"/skills/*/SKILL.md; do
+  [[ -f "$skill_file" ]] || continue
+  skill=$(basename "$(dirname "$skill_file")")
+  if [[ -n "$skill_filter" ]] && [[ "$skill" != "$skill_filter" ]]; then
+    continue
+  fi
+  skills+=("$skill")
+done
+
+if [[ ${#skills[@]} -eq 0 ]]; then
+  echo "No skills found."
+  exit 0
+fi
+
+# --- Check each skill ---
+
+printf "%-20s %-25s %-15s %-22s %s\n" "SKILL" "TEST" "STATUS" "RESULT DATE" "NOTES"
+printf "%-20s %-25s %-15s %-22s %s\n" "-----" "----" "------" "-----------" "-----"
+
+all_ok=true
+
+for skill in "${skills[@]}"; do
+  tests_dir="$SKILLS_ROOT/skills/$skill/tests"
+  skill_file="$SKILLS_ROOT/skills/$skill/SKILL.md"
+
+  # Check for tests directory
+  if [[ ! -d "$tests_dir" ]]; then
+    printf "%-20s %-25s %-15s %-22s %s\n" "$skill" "-" "no-tests" "-" "No tests/ directory"
+    all_ok=false
+    continue
+  fi
+
+  # Check for test YAMLs
+  test_files=("$tests_dir"/*.yaml)
+  if [[ ! -f "${test_files[0]}" ]]; then
+    printf "%-20s %-25s %-15s %-22s %s\n" "$skill" "-" "no-tests" "-" "No .yaml files in tests/"
+    all_ok=false
+    continue
+  fi
+
+  # Get last modification date of SKILL.md
+  skill_modified=$(git -C "$SKILLS_ROOT" log -1 --format=%aI -- "skills/$skill/SKILL.md" 2>/dev/null || echo "")
+
+  for test_file in "${test_files[@]}"; do
+    test_name=$(basename "$test_file" .yaml)
+
+    # Get last modification date of the test YAML
+    test_modified=$(git -C "$SKILLS_ROOT" log -1 --format=%aI -- "skills/$skill/tests/$test_name.yaml" 2>/dev/null || echo "")
+
+    # Find latest result
+    results_test_dir="$RESULTS_DIR/$skill/$test_name"
+    if [[ ! -d "$results_test_dir" ]]; then
+      printf "%-20s %-25s %-15s %-22s %s\n" "$skill" "$test_name" "missing" "-" "No results found"
+      all_ok=false
+      continue
+    fi
+
+    # Find the latest timestamp directory
+    latest_dir=$(ls -1d "$results_test_dir"/*/ 2>/dev/null | sort -r | head -1)
+    if [[ -z "$latest_dir" ]]; then
+      printf "%-20s %-25s %-15s %-22s %s\n" "$skill" "$test_name" "missing" "-" "No result directories"
+      all_ok=false
+      continue
+    fi
+
+    timestamp=$(basename "$latest_dir")
+    judge_file="$latest_dir/judge.json"
+
+    # Check judge.json exists
+    if [[ ! -f "$judge_file" ]]; then
+      printf "%-20s %-25s %-15s %-22s %s\n" "$skill" "$test_name" "unjudged" "$timestamp" "No judge.json"
+      all_ok=false
+      continue
+    fi
+
+    # Check status
+    status=$(jq -r '.skill_status // "unknown"' "$judge_file" 2>/dev/null)
+
+    # Check staleness: result timestamp vs file modification dates
+    stale=false
+    stale_note=""
+    if [[ -n "$skill_modified" ]] && [[ "$skill_modified" > "$timestamp" ]]; then
+      stale=true
+      stale_note="SKILL.md modified ${skill_modified%T*}"
+    fi
+    if [[ -n "$test_modified" ]] && [[ "$test_modified" > "$timestamp" ]]; then
+      stale=true
+      if [[ -n "$stale_note" ]]; then
+        stale_note="$stale_note; test modified ${test_modified%T*}"
+      else
+        stale_note="Test modified ${test_modified%T*}"
+      fi
+    fi
+
+    if $stale; then
+      printf "%-20s %-25s %-15s %-22s %s\n" "$skill" "$test_name" "stale" "$timestamp" "$stale_note"
+      all_ok=false
+    elif [[ "$status" == "satisfactory" ]]; then
+      printf "%-20s %-25s %-15s %-22s %s\n" "$skill" "$test_name" "ok" "$timestamp" ""
+    else
+      printf "%-20s %-25s %-15s %-22s %s\n" "$skill" "$test_name" "$status" "$timestamp" ""
+      all_ok=false
+    fi
+  done
+done
+
+echo
+
+if $all_ok; then
+  echo "All skills validated."
+  exit 0
+else
+  echo "Some skills need attention. Run skills-testing/scripts/run-skill-tests <skill> to update."
+  exit 1
+fi
