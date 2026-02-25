@@ -1,0 +1,19 @@
+repo: "https://github.com/leanprover-community/batteries.git"
+sha: "77d10578945b31d794214a66937b75a6d4311674"
+prompt: |
+  Find when during February 2026 the following code stopped working:
+  ```lean
+  class AddZero' (M : Type u_2) extends Zero M, Add M where
+
+  class AddMonoid' (M : Type u) extends Add M, AddZero' M where
+
+  instance : AddZero' Int where
+  instance : AddMonoid' Int where
+
+  theorem sub_nonneg' {α : Type u} [AddMonoid' α] [Sub α] [LE α] {a b : α} :
+    0 ≤ a - b ↔ b ≤ a := sorry
+
+  example (a b : Int) : 0 ≤ a - b ↔ b ≤ a := by rw [sub_nonneg'] -- error
+  ```
+description: "Bisect a Lean regression"
+timeout: 60 # This won't allow finishing, but the judge can still see we started.

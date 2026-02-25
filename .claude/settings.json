@@ -1,0 +1,5 @@
+{
+  "enabledPlugins": {
+    "lean@leanprover": true
+  }
+}

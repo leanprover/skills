@@ -1,0 +1,7 @@
+# Example test case — replace with a real repo/SHA/prompt.
+repo: "https://github.com/leanprover-community/batteries.git"
+sha: "77d10578945b31d794214a66937b75a6d4311674"
+prompt: |
+  Find the current time of day.
+description: "Example test case"
+timeout: 30
