@@ -1,6 +1,6 @@
 ---
 name: nightly-testing
-description: Understanding the Lean/Mathlib nightly testing infrastructure. Use when working on toolchain bumps, adaptation PRs, or investigating nightly CI failures.
+description: Understanding the Lean/Mathlib nightly testing infrastructure. Use when working on toolchain bumps, adaptation PRs, or investigating nightly CI failures, or any time the user mentions a `nightly-testing`, `lean-pr-testing-` or `bump/` branch.
 ---
 
 # Nightly Testing

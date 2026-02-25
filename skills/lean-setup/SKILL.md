@@ -1,5 +1,5 @@
 ---
-name: lean4-setup
+name: lean-setup
 description: Set up a lean4 repository clone with proper elan toolchains. 
 ---
 

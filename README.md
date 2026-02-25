@@ -12,7 +12,6 @@ These skills help AI coding agents work effectively with Lean 4 code — writing
 | `lean-setup` | Setting up a lean4 development environment with elan toolchains |
 | `lean-bisect` | Bisecting Lean toolchain versions to find regressions |
 | `lean-mwe` | Creating minimal working examples for bug reports |
-| `lean-pr` | PR conventions for the lean4 repository |
 | `mathlib-build` | Building Mathlib with appropriate verbosity settings |
 | `mathlib-pr` | PR conventions for Mathlib: labels, merge process, queueboard |
 | `mathlib-review` | Review guidelines for Mathlib PRs: tools, attributes, style checks |

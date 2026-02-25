@@ -59,6 +59,7 @@ all_ok=true
 skills_to_run=()
 skills_to_judge=()
 skills_needing_tests=()
+skills_not_satisfactory=()  # skill:test:status triples
 
 for skill in "${skills[@]}"; do
   tests_dir="$SKILLS_ROOT/skills/$skill/tests"
@@ -147,7 +148,7 @@ for skill in "${skills[@]}"; do
     else
       printf "%-20s %-25s %-15s %-22s %s\n" "$skill" "$test_name" "$status" "$timestamp" ""
       all_ok=false
-      skills_to_run+=("$skill")
+      skills_not_satisfactory+=("$skill:$test_name:$status")
     fi
   done
 done
@@ -156,6 +157,8 @@ echo
 
 if $all_ok; then
   echo "All skills validated."
+  echo
+  echo "cd skills-testing && git add -A && git commit -m 'Update test results' && git push && cd .."
   exit 0
 fi
 
@@ -168,12 +171,41 @@ skills_needing_tests=($(printf '%s\n' "${skills_needing_tests[@]}" | sort -u))
 
 echo "Next steps:"
 echo
+echo "# View detailed results:"
+echo "skills-testing/scripts/summary --latest"
+echo
 
 if [[ ${#skills_needing_tests[@]} -gt 0 ]]; then
   echo "# Add test cases for:"
   for s in "${skills_needing_tests[@]}"; do
     echo "#   skills/$s/tests/<test-name>.yaml"
   done
+  echo
+fi
+
+if [[ ${#skills_not_satisfactory[@]} -gt 0 ]]; then
+  for entry in "${skills_not_satisfactory[@]}"; do
+    s="${entry%%:*}"; rest="${entry#*:}"; t="${rest%%:*}"; st="${rest#*:}"
+    case "$st" in
+      not_needed)
+        echo "# skills/$s/$t: not needed — make the test more challenging, or consider deleting the skill"
+        ;;
+      needs_improvement)
+        echo "# skills/$s/$t: needs improvement — edit skills/$s/SKILL.md, then re-run"
+        ;;
+      *)
+        echo "# skills/$s/$t: status '$st' — review skills-testing/results/$s/$t/"
+        ;;
+    esac
+  done
+  # Only add re-run advice for skills that need improvement (not for not_needed)
+  for entry in "${skills_not_satisfactory[@]}"; do
+    s="${entry%%:*}"; rest="${entry#*:}"; st="${rest#*:}"
+    if [[ "$st" != "not_needed" ]]; then
+      skills_to_run+=("$s")
+    fi
+  done
+  skills_to_run=($(printf '%s\n' "${skills_to_run[@]}" | sort -u))
   echo
 fi
 
@@ -189,9 +221,7 @@ if [[ ${#skills_to_judge[@]} -gt 0 ]]; then
   echo
 fi
 
-if [[ ${#skills_to_run[@]} -gt 0 ]] || [[ ${#skills_to_judge[@]} -gt 0 ]]; then
-  echo "# Then commit results:"
-  echo "cd skills-testing && git add -A && git commit -m 'Update test results' && git push && cd .."
-fi
+echo "# Then re-check:"
+echo "scripts/check-validation"
 
 exit 1
