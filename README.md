@@ -20,6 +20,10 @@ These skills help AI coding agents work effectively with Lean 4 code — writing
 
 ## Installation
 
+### Agent Plugins-compatible clients
+
+Point a client that supports [Agent Plugins 1.0.0](https://agent-plugins.org/specification) and Agent Skills at this repository's root. The client reads [`plugin.json`](plugin.json) and discovers the skills in `skills/`. Use your client's plugin manager to enable or remove the plugin.
+
 ### Claude Code
 
 In Claude Code, type `/plugin`, under "Marketplaces" add "https://github.com/leanprover/skills.git", then under "Plugins" install the `lean` plugin.
@@ -38,16 +42,16 @@ gemini skills install https://github.com/leanprover/skills --path skills
 
 ### Codex CLI
 
-Inside a Codex session:
-```
-$skill-installer install https://github.com/leanprover/skills/tree/main/skills/*
+Add the Lean marketplace and install the `lean` plugin.
+
+```bash
+codex plugin marketplace add leanprover/skills
+codex plugin add lean@leanprover
 ```
 
-Or clone and copy the skills:
-```bash
-git clone https://github.com/leanprover/skills.git /tmp/lean-skills
-cp -r /tmp/lean-skills/skills/* ~/.codex/skills/
-```
+To install from a local checkout, run `codex plugin marketplace add .` from the repository root in place of the first command.
+
+Start a new Codex session to use the plugin. For example, ask Codex to help write a Lean proof using `lean-proof`. To uninstall, run `codex plugin remove lean@leanprover`.
 
 ### Other tools
 
