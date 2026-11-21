@@ -1,0 +1,20 @@
+{
+  "name": "leanprover",
+  "interface": {
+    "displayName": "Lean"
+  },
+  "plugins": [
+    {
+      "name": "lean",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}
